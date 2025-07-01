@@ -21,6 +21,7 @@ It allows you to shorten long URLs anbd redirect users to the original URL when 
 ## Setup Instructions
 
 `git clone https://github.com/talroz532/URLshortener.git`
+
 `cd URLshortener`
 Run it to if using MVC or enter `dotnet run` at the terminal command
 
