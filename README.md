@@ -7,16 +7,16 @@ It allows you to shorten long URLs anbd redirect users to the original URL when 
 
 ## Technologies Used
 
-* ** .NET 7 (or later) Framework- for building the API.
-* ** C#: The programming language.
-* ** ASP.NET: for the web API.
-* ** Entity Framework Core: for ineracting with the database.
-* ** In-Memory Database: Simple RAM database.
-* ** Swagger/OpenAPI: Dealing with the API and testing it.
+*  .NET 7 (or later) Framework- for building the API.
+*  C#: The programming language.
+*  ASP.NET: for the web API.
+*  Entity Framework Core: for ineracting with the database.
+*  In-Memory Database: Simple RAM database.
+*  Swagger/OpenAPI: Dealing with the API and testing it.
 
 ## Prerequisites
-* **.NET SDK 7 (or later): Download and install the .NET SDK.
-* ** IDE (optinal): Visual studio (MVC- recommended)
+* NET SDK 7 (or later): Download and install the .NET SDK.
+* IDE (optinal): Visual studio (MVC- recommended)
 
 ## Setup Instructions
 
