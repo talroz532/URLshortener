@@ -1,4 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using URLshortener.Data;
@@ -7,7 +6,7 @@ using URLshortener.Models;
 
 namespace URLshortener.Controllers
 {
-    [Route("api/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UrlShortenerController : ControllerBase
     {
@@ -18,74 +17,67 @@ namespace URLshortener.Controllers
             _context = context;
         }
 
-        [HttpPost]
-        public JsonResult shorten(Urllist urls)
+        // POST: api/UrlShortener/shorten
+        [HttpPost("shorten")]
+        public IActionResult Shorten([FromBody] Urllist urls)
         {
-
-            var urlInDb = _context.Urls.FirstOrDefault(urlRecord => urlRecord.UrlLong == urls.UrlLong);
-
-            
-
-
-            if (string.IsNullOrWhiteSpace(urls.UrlLong)) // Check if the 'url' parameter is missing or empty
+            // Validate if the long URL is provided
+            if (string.IsNullOrWhiteSpace(urls.UrlLong))
             {
-                
-
-                // If the URL is empty or just spaces, return an error response (400 Bad Request)
-                return new JsonResult(BadRequest("URL is required."));
-
-            } else if (!urls.UrlLong.StartsWith("http://") && !urls.UrlLong.StartsWith("https://")) { //check if its a real http/s URL
-
-                return new JsonResult(BadRequest("Not a valid URL... \nURL must start with http:// or https://"));
-
-            } 
-            
-            else if (urlInDb != null) // Check if the long URL already exists in the database
-            {
-
-                // If it exists, return the existing short URL
-                return new JsonResult(Ok(urls.UrlShort));
+                return BadRequest("URL is required.");
             }
-            
+
+            // Validate URL format
+            if (!urls.UrlLong.StartsWith("http://") && !urls.UrlLong.StartsWith("https://"))
+            {
+                return BadRequest("Invalid URL. URL must start with http:// or https://");
+            }
+
+            // Check if the long URL already exists in the database
+            var urlInDb = _context.Urls.FirstOrDefault(u => u.UrlLong == urls.UrlLong);
+            if (urlInDb != null)
+            {
+                // Return existing short URL if found
+                return Ok(new { urlShort = urlInDb.UrlShort });
+            }
+
+            // Generate a short URL
             urls.UrlShort = UrlFunctions.toShort(urls.UrlLong);
 
-
+            // Save new entry to the database
             _context.Urls.Add(urls);
             _context.SaveChanges();
-            return new JsonResult(Ok(urls));
 
+            // Return newly created short URL
+            return Ok(urls);
         }
 
-        [HttpGet]
-        [Route("/{giventUrl}")]
-        public IActionResult RedirectToLongUrl(string giventUrl)
+        // GET: /{shortUrl}
+        [HttpGet("/api/{shortUrl}")]
+        public IActionResult RedirectToLongUrl(string shortUrl)
         {
-            if (string.IsNullOrWhiteSpace(giventUrl))
+            if (string.IsNullOrWhiteSpace(shortUrl))
             {
                 return BadRequest("Short URL is required.");
             }
 
-            var urlRecord = _context.Urls.FirstOrDefault(u => u.UrlShort == giventUrl);
-
+            // Look for the short URL in the database
+            var urlRecord = _context.Urls.FirstOrDefault(u => u.UrlShort == shortUrl);
             if (urlRecord == null)
             {
                 return NotFound("Short URL not found.");
             }
 
-            // This performs an actual HTTP 302 redirect to the original URL
+            // Redirect to the original long URL
             return Redirect(urlRecord.UrlLong);
         }
 
-
-
-        // Get all
-        [HttpGet()]
-        public JsonResult GetAll()
+        // GET: api/UrlShortener/all
+        [HttpGet("all")]
+        public IActionResult GetAll()
         {
             var result = _context.Urls.ToList();
-
-            return new JsonResult(Ok(result));
+            return Ok(result);
         }
-
     }
 }
